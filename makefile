@@ -3,6 +3,9 @@ HAYSTACK_VERSION := v1.11.0
 clone-haystack:
 	git clone --depth 1 --branch $(HAYSTACK_VERSION) https://github.com/deepset-ai/haystack.git
 
+clean:
+	rm -r haystack
+	
 upload-data:
 	# upload the text documents
 	curl -X 'POST' \
