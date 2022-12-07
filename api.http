@@ -29,3 +29,76 @@ curl -X 'POST' \
   "debug": false
 }'
 
+###----------------------------------------------------------------------------------------------------------------
+# Weaviate stuff
+# get info about current Weaviate instance
+GET http://localhost:8080/v1/meta
+
+###
+# check weaviate nodes' health
+curl http://localhost:8080/v1/nodes
+
+###
+# get all objects in Weaviate
+GET http://localhost:8080/v1/objects
+
+###
+# get Weaviate schema
+GET http://localhost:8080/v1/schema
+
+###
+# create a Document
+POST http://localhost:8080/v1/objects
+Content-Type: application/json
+
+{
+  "class": "Document",
+  "properties": {
+    "name": "hello.txt",
+    "content_type": "text",
+    "content": "Hello world!"
+  }
+}
+
+###
+# delete a Document
+DELETE  http://localhost:8080/v1/objects/Document/010750a4-aaf0-4ab9-9191-e4fe189cdce0
+
+###
+# get the content and vector representation of all Documents
+POST http://localhost:8080/v1/graphql
+X-Request-Type: GraphQL
+Content-Type: application/json
+
+query {
+  Get {
+    Document {
+        content
+        _additional {
+          vector
+        }
+    }
+  }
+}
+
+###
+# get the content near a specified search term
+POST http://localhost:8080/v1/graphql
+X-Request-Type: GraphQL
+Content-Type: application/json
+
+query {
+  Get {
+    Document(
+         nearText: {
+          concepts: ["a banana has more calories than it is long"]
+        }
+    )  {
+      content
+      _additional {
+        id
+        distance
+      } 
+    }
+  }
+}
