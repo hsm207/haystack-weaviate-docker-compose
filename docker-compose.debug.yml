@@ -1,0 +1,40 @@
+version: '3.4'
+
+services:
+  haystack-api:
+    build:
+      context: .
+      dockerfile: ./haystack.Dockerfile
+    ports:
+      - 8000:8000
+      - 5678:5678
+    restart: on-failure
+    environment:
+      # See rest_api/pipeline/pipelines.haystack-pipeline.yml for configurations of Search & Indexing Pipeline.
+      - PIPELINE_YAML_PATH=/app/rest_api/rest_api/pipeline/pipelines.haystack-pipeline.yml
+      - QUERY_PIPELINE_NAME=query
+      - TOKENIZERS_PARALLELISM=false
+    working_dir: /app/rest_api
+    volumes:
+      - ./haystack:/app
+      - ./pipelines.haystack-pipeline.yml:/app/rest_api/rest_api/pipeline/pipelines.haystack-pipeline.yml
+    command: "/bin/bash -c 'pip install debugpy -t /tmp && python /tmp/debugpy --wait-for-client --listen 0.0.0.0:5678 -m gunicorn rest_api.application:app -b 0.0.0.0 -k uvicorn.workers.UvicornWorker --workers 1 --timeout 3600'"
+    depends_on:
+      - weaviate
+
+  weaviate:
+    image: semitechnologies/weaviate:1.16.6
+    ports:
+      - 8080:8080
+    environment:
+      - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
+      - PERSISTENCE_DATA_PATH=/var/lib/weaviate
+      - QUERY_DEFAULTS_LIMIT=20
+      - DEFAULT_VECTORIZER_MODULE=text2vec-transformers
+      - ENABLE_MODULES=text2vec-transformers
+      - TRANSFORMERS_INFERENCE_API=http://t2v-transformers:8080
+
+  t2v-transformers:
+    image: semitechnologies/transformers-inference:sentence-transformers-paraphrase-MiniLM-L6-v2
+    environment:
+      ENABLE_CUDA: 0
