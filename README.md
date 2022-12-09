@@ -18,5 +18,5 @@ A simple demo to show how to  configure a docker compose deployment of [Haystack
 Notes:
 
 * Have a look at the [api.http](./api.http) for some examples on how to interact with the solution
-* Cheack out this [blog post](https://medium.com/@_init_/a-beginners-guide-to-configuring-haystack-to-work-with-weaviate-6f90dc903175) for more details about the configuration 
+* Check out this [blog post](https://medium.com/@_init_/a-beginners-guide-to-configuring-haystack-to-work-with-weaviate-6f90dc903175) for more details about the configuration 
 
